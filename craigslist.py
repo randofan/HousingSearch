@@ -1,10 +1,25 @@
 import asyncio
 import requests
 from bs4 import BeautifulSoup
-from utils import getPrice, keys
+from utils import getNum
 import time
 from httpx import AsyncClient
 
+
+async def getURL(url):
+    soup = BeautifulSoup(requests.get(url).content, 'html.parser')
+    urls = (url['href'] for url in soup.find_all('a', class_='result-title hdrlnk'))
+    
+    async with AsyncClient() as client:
+        tasks = (client.get(url) for url in urls)
+        reqs = await asyncio.gather(*tasks)
+        
+    soups = [BeautifulSoup(req.text, 'html.parser') for req in reqs]
+    print(len(soups))
+
+
+if __name__ == '__main__':
+    asyncio.run(getURL('https://seattle.craigslist.org/search/apa'))      
 
 
 def search_craigslist(user_query={}):
@@ -17,19 +32,20 @@ def search_craigslist(user_query={}):
     # TODO append translated user queries
     
     query = "&".join(f'{k}={v}' for k,v in query.items())
-    houses = []
     i = 0
     # while True:
     page = requests.get(f'https://www.craigslist.org/search/apa?s={i}&{query}')
     soup = BeautifulSoup(page.content, 'html.parser')
-    raw_data = soup.find(class_='rows').find_all('li', class_='result-row')
+    urls = soup.find_all('a', class_='result-title hdrlnk')['href']
+    
+    
     # if not raw_data: break
     
     async def parse_listing(data):
         # try:
             url = data.find('a', class_='result-title hdrlnk')['href']
             
-            house = {'price': getPrice(str(data.find('span', class_='result-price'))), 
+            house = {'price': getPrice(str(data.find('span', class_='price'))), 
                     'url': url}
             
             house_soup = await BeautifulSoup(client.get(url).text, 'html.parser')
@@ -77,10 +93,3 @@ def test():
     soup = BeautifulSoup(page.content, 'html.parser')
     print(time.time() - start)
     
-if __name__ == '__main__':
-    start = time.time()
-    l = search_craigslist()
-    print(time.time()-start)
-    print(l[0])
-    print(len(l))
-    # test()
