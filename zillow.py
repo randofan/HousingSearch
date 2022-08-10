@@ -2,22 +2,10 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import json
-from constants import zillow_convert
-from utils import getPrice, keys
+
+from utils import getNum, TranslateZillow
 
 def search_zillow(user_query={}):
-    
-    # Translate filters into URL arguments.
-    translated_query = {}
-    for k,v in user_query.items():
-        try:
-            if isinstance(v, bool): translated_query[zillow_convert[k]] = {'value': v}
-            elif isinstance(v, int) or isinstance(v, float): translated_query[zillow_convert[k]] = {'min': v}
-        except KeyError:
-            print(f'"{k}" is not a valid key.\n')
-            raise KeyError
-    
-    # Query constants.
     query = {"pagination": {}, 
              "isMapVisible":True, 
              "mapBounds":{"west":-122.34915592114258,"east":-122.21423007885743,"south":47.64551478474824,"north":47.67615329343806},
@@ -37,7 +25,7 @@ def search_zillow(user_query={}):
                  "isForRent":{"value":True}
              }
     }
-    query['filterState'].update(translated_query)
+    query['filterState'].update(TranslateZillow(user_query))
     wants = {"cat1":['mapResults']}
     
     ds = Service('chromedriver.exe')
@@ -49,8 +37,8 @@ def search_zillow(user_query={}):
     
     try:
         raw_data = driver.find_element(By.TAG_NAME, "pre").text
-    except Exception:
-        print(f'query incorrectly created or captcha lol fuck zillow.\n')
+    except AttributeError:
+        print(f'The dreaded Zillow Captcha...Unfortunately try again later.\n')
         driver.quit()
         raise AttributeError
         
@@ -62,7 +50,7 @@ def search_zillow(user_query={}):
         house = dict()
         try:
             house.update({'address': r['address'], 
-                    'price': getPrice(r['price']), 
+                    'price': getNum(r['price']), 
                     'beds': r['beds'] if 'beds' in r else r['minBeds'], 
                     'baths': r['baths'] if 'baths' in r else r['minBaths'], 
                     'area': r['area'] if 'area' in r else r['minArea'], 
@@ -73,9 +61,6 @@ def search_zillow(user_query={}):
             if house['address'] == '--':
                 house['address'] = r['detailUrl'].split('/')[2].replace('-', ' ')
             
-            if set(house) != keys:
-                print(f'House does not contain all required keys.')
-                raise KeyError
             houses.append(house)
             
         except Exception:

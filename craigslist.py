@@ -1,25 +1,24 @@
 import asyncio
 import requests
 from bs4 import BeautifulSoup
-from utils import getNum
+from utils import TranslateCraigslist, getNum, House, Filters
 import time
 from httpx import AsyncClient
 
 
 async def getURL(url):
     soup = BeautifulSoup(requests.get(url).content, 'html.parser')
-    urls = (url['href'] for url in soup.find_all('a', class_='result-title hdrlnk'))
+    if not soup.find(class_='result-row'): return []
     
+    # limit to only 1 requests so I don't get banned
+    urls = (url['href'] for url in soup.find_all('a', class_='result-title hdrlnk')[:1])
+
     async with AsyncClient() as client:
         tasks = (client.get(url) for url in urls)
         reqs = await asyncio.gather(*tasks)
         
     soups = [BeautifulSoup(req.text, 'html.parser') for req in reqs]
-    print(len(soups))
-
-
-if __name__ == '__main__':
-    asyncio.run(getURL('https://seattle.craigslist.org/search/apa'))      
+    return zip(soups, urls)
 
 
 def search_craigslist(user_query={}):
@@ -28,68 +27,40 @@ def search_craigslist(user_query={}):
              'postal':98105, 
              'availabilityMode':0, 
              'sale_date':'all+dates'}
-    
-    # TODO append translated user queries
+    query.update(TranslateCraigslist(user_query))
     
     query = "&".join(f'{k}={v}' for k,v in query.items())
+    houses = []
+    
     i = 0
-    # while True:
-    page = requests.get(f'https://www.craigslist.org/search/apa?s={i}&{query}')
-    soup = BeautifulSoup(page.content, 'html.parser')
-    urls = soup.find_all('a', class_='result-title hdrlnk')['href']
-    
-    
-    # if not raw_data: break
-    
-    async def parse_listing(data):
-        # try:
-            url = data.find('a', class_='result-title hdrlnk')['href']
+    while True:
+        soups_url = asyncio.run(getURL(f'https://www.craigslist.org/search/apa?s={i}&{query}'))
+        if not soups_url: break
+        
+        for soup, url in soups_url:
+            house = House()
+            house.address = soup.find('div', class_='mapaddress')
+            house.price = getNum(soup.find('span', class_='price').text)
+            house.url = url
+            house.image = soup.find('img')
             
-            house = {'price': getPrice(str(data.find('span', class_='price'))), 
-                    'url': url}
+            map_obj = soup.find(id='map')
+            house.coords = {'latitude': map_obj['data-latitude'], 'longitude': map_obj['data-longitude']}
             
-            house_soup = await BeautifulSoup(client.get(url).text, 'html.parser')
-            
-            map_obj = house_soup.find(id='map')
-            house['coords'] = {'latitude': map_obj['data-latitude'], 'longitude': map_obj['data-longitude']}
-            
-            image = house_soup.find('img')
-            house['image'] = image['src'] if image else None
-            
-            address = house_soup.find('div', class_='mapaddress')
-            house['address'] = address.text if address else None
-            
-            attr = house_soup.find_all(class_='shared-line-bubble')
+            attr = soup.find_all(class_='shared-line-bubble')
             for a in attr:
                 a = str(a)
                 elem = a.split('<b>')
                 for e in elem:
-                    if 'BR' in e: house['beds'] = getPrice(e) 
-                    elif 'Ba' in e: house['baths'] = getPrice(e) 
-                    elif 'ft' in e: house['area'] = getPrice(e)[:-1] 
-            
-            if 'beds' not in house: house['beds'] = 0
-            if 'baths' not in house: house['baths'] = 0
-            if 'area' not in house: house['area'] = 0
+                    if 'BR' in e: house.beds = getNum(e) 
+                    elif 'Ba' in e: house.baths = getNum(e) 
+                    elif 'ft' in e: house.area = getNum(e)[:-1] 
             
             houses.append(house)
-            
-        # except Exception:
-        #     print(f'There was an error with one of the listings: \n\n')
-            
-    for data in raw_data:
-        asyncio.run(parse_listing(data))
-    
-            
-    i += 120
+        i += 120
         
     return houses
 
-def test():
-    start = time.time()
-    page = requests.get(f'https://www.craigslist.org/search/apa?s=0')
-    print(time.time() - start)
-    start = time.time()
-    soup = BeautifulSoup(page.content, 'html.parser')
-    print(time.time() - start)
-    
+if __name__ == '__main__':
+    l = search_craigslist()
+    print(l)

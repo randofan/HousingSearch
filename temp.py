@@ -1,3 +1,8 @@
+# Ignore this. I was trying to mess around with this library I found online but it didn't really work.
+
+
+import pycraigslist
+
 def craigslist_filters(args):
     filters = dict()
     houses = []
@@ -17,10 +22,14 @@ def craigslist_filters(args):
     return filters
 
 
-def craigslist():    
+def craigslist():  
     houses = pycraigslist.housing.apa(site="seattle", zip_code="98105")
     filters = {'min_bedrooms': '10'}
     houses = list(pycraigslist.housing.apa(site="seattle", zip_code="98105", filters=filters).search())
 
     print(houses.get_filters())
     print(houses[0])
+    
+if __name__ == '__main__':
+    print('hello')  
+    craigslist()
