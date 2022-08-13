@@ -56,6 +56,10 @@ def search_zillow(user_query=Filters()):
     
 
 if __name__ == '__main__':
-
+    # ds = Service('chromedriver.exe')
+    # driver = webdriver.Chrome(service=ds)
+    # driver.get("https://www.zillow.com/")
+    # driver.get('https://www.zillow.com/search/GetSearchPageState.htm?searchQueryState={"pagination":{},"usersSearchTerm":"98105","mapBounds":{"west":-122.31194831768799,"east":-122.25143768231202,"south":47.62593719553573,"north":47.69571206415039},"regionSelection":[{"regionId":99565,"regionType":7}],"isMapVisible":true,"filterState":{"isForSaleByAgent":{"value":false},"isForSaleByOwner":{"value":false},"isNewConstruction":{"value":false},"isForSaleForeclosure":{"value":false},"isComingSoon":{"value":false},"isAuction":{"value":false},"isForRent":{"value":true},"isAllHomes":{"value":true},"isMultiFamily":{"value":false},"isManufactured":{"value":false},"isLotLand":{"value":false}},"isListVisible":true,"mapZoom":14}&wants={"cat1":["listResults","mapResults"]}')
+    
     houses = search_zillow(Filters(beds=3, price=1000))
     print(len(houses))

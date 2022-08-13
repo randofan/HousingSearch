@@ -19,6 +19,16 @@ craigslist_convert = {
     'house': {'housing_type': 9}
 }
 
+'''
+https://www.zillow.com/search/GetSearchPageState.htm?searchQueryState={"pagination":{},
+"usersSearchTerm":"98105","mapBounds":{"west":-122.31194831768799,"east":-122.25143768231202,
+"south":47.62593719553573,"north":47.69571206415039},"regionSelection":[{"regionId":99565,"regionType":7}],
+"isMapVisible":true,"filterState":{"isForSaleByAgent":{"value":false},"isForSaleByOwner":{"value":false},
+"isNewConstruction":{"value":false},"isForSaleForeclosure":{"value":false},"isComingSoon":{"value":false},
+"isAuction":{"value":false},"isForRent":{"value":true},"isAllHomes":{"value":true},"isMultiFamily":{"value":false},
+"isManufactured":{"value":false},"isLotLand":{"value":false}},"isListVisible":true,"mapZoom":14}
+&wants={"cat1":["listResults","mapResults"]}
+'''
 
 zillow_convert = {
     'beds': 'beds', # int
