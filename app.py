@@ -1,10 +1,14 @@
-from flask import Flask, render_template, requests
+from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-import constants
+from utils import House, Filters
+from dacite import from_dict
+from housingsearch import search_all
 
 
 app = Flask(__name__)
+
+# TODO db caching to limit number of requests
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 # db = SQLAlchemy(app)
 
@@ -21,12 +25,15 @@ app = Flask(__name__)
 #     def __repr__(self):
 #         return '<Task %r>' % self.address
 
+
+
+### DO NOT RUN!!! OR ELSE CRAIGSLIST AND ZILLOW WILL BAN YOUR IP ###
 @app.route('/', methods=['GET'])
 def index():
     houses = []
-    # if request.args:
-    #     filters = craigslist_filters(request.args)
-    #     houses.extend(list(pycraigslist.housing.apa(site="seattle", zip_code="98105", filters=filters).search()))
+    if request.args:
+        filters: Filters = from_dict(request.args)
+        houses: set[House] = search_all(filters)
     return render_template('index.html', houses=houses)
 
 @app.route('/update', methods=['POST'])

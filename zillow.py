@@ -1,11 +1,12 @@
-from selenium import webdriver
+from selenium import webdriver, common
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import json
+import time
+from utils import getNum, House, Filters, Translate, TranslationType
 
-from utils import getNum, TranslateZillow
-
-def search_zillow(user_query={}):
+def search_zillow(user_query=Filters()):
+   
     query = {"pagination": {}, 
              "isMapVisible":True, 
              "mapBounds":{"west":-122.34915592114258,"east":-122.21423007885743,"south":47.64551478474824,"north":47.67615329343806},
@@ -25,61 +26,36 @@ def search_zillow(user_query={}):
                  "isForRent":{"value":True}
              }
     }
-    query['filterState'].update(TranslateZillow(user_query))
+    query['filterState'].update(dict(Translate(user_query, TranslationType.ZILLOW)))
     wants = {"cat1":['mapResults']}
     
     ds = Service('chromedriver.exe')
-    driver = webdriver.Chrome(service=ds)
-
-    # Must visit zillow homepage first to set cookies.
-    driver.get("https://www.zillow.com/")
-    driver.get(f"https://www.zillow.com/search/GetSearchPageState.htm?searchQueryState={json.dumps(query)}&wants={json.dumps(wants)}")
+    with webdriver.Chrome(service=ds) as driver:
+        # Must visit zillow homepage first to set cookies.
+        driver.get("https://www.zillow.com/")
+        driver.get(f"https://www.zillow.com/search/GetSearchPageState.htm?searchQueryState={json.dumps(query)}&wants={json.dumps(wants)}")
+        time.sleep(20)
+        raw_data = None
+        try: raw_data = driver.find_element(By.TAG_NAME, "pre").text
+        except common.exceptions.NoSuchElementException: print(f'The dreaded Zillow Captcha...Unfortunately try again later')
     
-    try:
-        raw_data = driver.find_element(By.TAG_NAME, "pre").text
-    except AttributeError:
-        print(f'The dreaded Zillow Captcha...Unfortunately try again later.\n')
-        driver.quit()
-        raise AttributeError
-        
-    driver.quit()
+    houses = set()
+    if not raw_data: return houses
     
     response = json.loads(raw_data)["cat1"]["searchResults"]["mapResults"]
-    houses = []
     for r in response:
-        house = dict()
-        try:
-            house.update({'address': r['address'], 
-                    'price': getNum(r['price']), 
-                    'beds': r['beds'] if 'beds' in r else r['minBeds'], 
-                    'baths': r['baths'] if 'baths' in r else r['minBaths'], 
-                    'area': r['area'] if 'area' in r else r['minArea'], 
-                    'url': f'https://www.zillow.com{r["detailUrl"]}', 
-                    'image': r['imgSrc'],
-                    'coords': r['latLong']})
-            
-            if house['address'] == '--':
-                house['address'] = r['detailUrl'].split('/')[2].replace('-', ' ')
-            
-            houses.append(house)
-            
-        except Exception:
-            print(f'There was an error with one of the listings:\n\n{house}\n\n{r}')
+        try:          
+            house = House(r['detailUrl'].split('/')[2].replace('-', ' ') if r['address'] == '--' else r['address'],
+                          getNum(r['price']), r['beds'] if 'beds' in r else 0, 
+                          r['baths'] if 'baths' in r else 0, r['area'] if 'area' in r else 0,
+                          f'https://www.zillow.com{r["detailUrl"]}', r['imgSrc'], r['latLong'])
+            houses.add(house)    
+        except KeyError: print(f'ZILLOW: There was an error parsing https://www.zillow.com{r["detailUrl"]}')
         
-    del response, raw_data
     return houses
-    
-    
-def test():
-    ds = Service('chromedriver.exe')
-    driver = webdriver.Chrome(service=ds)
-
-    # Must visit zillow homepage first to set cookies.
-    driver.get("https://www.zillow.com/")
     
 
 if __name__ == '__main__':
 
-    houses = search_zillow()
+    houses = search_zillow(Filters(beds=3, price=1000))
     print(len(houses))
-    # test()

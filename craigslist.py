@@ -1,7 +1,7 @@
 import asyncio
 import requests
 from bs4 import BeautifulSoup
-from utils import TranslateCraigslist, getNum, House, Filters
+from utils import Translate, getNum, House, Filters, TranslationType
 import time
 from httpx import AsyncClient
 
@@ -11,7 +11,7 @@ async def getURL(url):
     if not soup.find(class_='result-row'): return []
     
     # limit to only 1 requests so I don't get banned
-    urls = (url['href'] for url in soup.find_all('a', class_='result-title hdrlnk')[:1])
+    urls = list(url['href'] for url in soup.find_all('a', class_='result-title hdrlnk')[:1])
 
     async with AsyncClient() as client:
         tasks = (client.get(url) for url in urls)
@@ -21,46 +21,49 @@ async def getURL(url):
     return zip(soups, urls)
 
 
-def search_craigslist(user_query={}):
+def search_craigslist(user_query=Filters()):
     
-    query = {'bundleDuplicates':1, 
-             'postal':98105, 
-             'availabilityMode':0, 
-             'sale_date':'all+dates'}
-    query.update(TranslateCraigslist(user_query))
+    query = [('bundleDuplicates',1), 
+             ('postal',98105), 
+             ('availabilityMode',0), 
+             ('sale_date','all+dates')]
+    query.extend(Translate(user_query, TranslationType.CRAIGSLIST))
     
-    query = "&".join(f'{k}={v}' for k,v in query.items())
-    houses = []
+    query = "&".join(f'{k}={v}' for k,v in query)
     
     i = 0
-    while True:
-        soups_url = asyncio.run(getURL(f'https://www.craigslist.org/search/apa?s={i}&{query}'))
-        if not soups_url: break
+    # while True:
+    soups_url = asyncio.run(getURL(f'https://www.craigslist.org/search/apa?s={i}&{query}'))
+    # if not soups_url: break
+    
+    houses = set()
+    for soup, url in soups_url:
         
-        for soup, url in soups_url:
-            house = House()
-            house.address = soup.find('div', class_='mapaddress')
-            house.price = getNum(soup.find('span', class_='price').text)
-            house.url = url
-            house.image = soup.find('img')
+        beds, baths, area = 0,0,0
+        attr = soup.find_all(class_='shared-line-bubble')
+        for a in attr:
+            a = str(a)
+            elem = a.split('<b>')
+            for e in elem:
+                if 'BR' in e: beds += getNum(e) 
+                elif 'Ba' in e: baths += getNum(e) 
+                elif 'ft' in e: area += (getNum(e) // 10)
+        
+        try:
+            address = soup.find('div', class_='mapaddress').text
+            price = getNum(soup.find('span', class_='price').text)
+            image = soup.find('img')['src']
             
             map_obj = soup.find(id='map')
-            house.coords = {'latitude': map_obj['data-latitude'], 'longitude': map_obj['data-longitude']}
-            
-            attr = soup.find_all(class_='shared-line-bubble')
-            for a in attr:
-                a = str(a)
-                elem = a.split('<b>')
-                for e in elem:
-                    if 'BR' in e: house.beds = getNum(e) 
-                    elif 'Ba' in e: house.baths = getNum(e) 
-                    elif 'ft' in e: house.area = getNum(e)[:-1] 
-            
-            houses.append(house)
-        i += 120
+            coords = {'latitude': float(map_obj['data-latitude']), 'longitude': float(map_obj['data-longitude'])}
+
+            houses.add(House(address, price, beds, baths, area, url, image, coords))
+        except AttributeError: print(f'CRAIGSLIST: There was an error parsing {url}')
+        
+    i += 120
         
     return houses
 
 if __name__ == '__main__':
-    l = search_craigslist()
-    print(l)
+    s = search_craigslist()
+    print(s)
