@@ -1,4 +1,5 @@
 import asyncio
+import random
 import requests
 from bs4 import BeautifulSoup
 from utils import Translate, getNum, House, Filters, TranslationType
@@ -7,11 +8,13 @@ from httpx import AsyncClient
 
 
 async def getURL(url):
+    REQUESTS = random.randrange(5,20)
+    print(REQUESTS)
     soup = BeautifulSoup(requests.get(url).content, 'html.parser')
     if not soup.find(class_='result-row'): return []
     
-    # limit to only 1 requests so I don't get banned
-    urls = list(url['href'] for url in soup.find_all('a', class_='result-title hdrlnk')[:1])
+    # limit to only 5-20 requests so I don't get banned
+    urls = list(url['href'] for url in soup.find_all('a', class_='result-title hdrlnk')[:REQUESTS])
 
     async with AsyncClient() as client:
         tasks = (client.get(url) for url in urls)
@@ -28,15 +31,10 @@ def search_craigslist(user_query=Filters()):
              ('availabilityMode',0), 
              ('sale_date','all+dates')]
     query.extend(Translate(user_query, TranslationType.CRAIGSLIST))
-    
     query = "&".join(f'{k}={v}' for k,v in query)
     
-    i = 0
-    # while True:
-    soups_url = asyncio.run(getURL(f'https://www.craigslist.org/search/apa?s={i}&{query}'))
-    # if not soups_url: break
-    
-    houses = set()
+    soups_url = asyncio.run(getURL(f'https://www.craigslist.org/search/apa?s=0&{query}'))
+    houses = list()
     for soup, url in soups_url:
         
         beds, baths, area = 0,0,0
@@ -56,14 +54,13 @@ def search_craigslist(user_query=Filters()):
             
             map_obj = soup.find(id='map')
             coords = {'latitude': float(map_obj['data-latitude']), 'longitude': float(map_obj['data-longitude'])}
-
-            houses.add(House(address, price, beds, baths, area, url, image, coords))
+            houses.append(House(address, price, beds, baths, area, url, image, coords))
         except AttributeError: print(f'CRAIGSLIST: There was an error parsing {url}')
-        
-    i += 120
         
     return houses
 
 if __name__ == '__main__':
     s = search_craigslist()
+    print(len(s))
     print(s)
+    print('\n')

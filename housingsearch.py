@@ -4,9 +4,7 @@ from craigslist import search_craigslist
 
 def search_all(filters):
     houses = []
-    zillow: set[House] = search_zillow(filters)
-    craigslist: set[House] = search_craigslist(filters)
-    for house in zillow: 
-        if house in craigslist: craigslist.remove(house)
+    zillow: list[House] = search_zillow(filters)
+    craigslist: list[House] = search_craigslist(filters)
     houses.extend(zillow).extend(craigslist)
     return houses

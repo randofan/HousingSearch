@@ -33,7 +33,7 @@ def index():
     houses = []
     if request.args:
         filters: Filters = from_dict(request.args)
-        houses: set[House] = search_all(filters)
+        houses: list[House] = search_all(filters)
     return render_template('index.html', houses=houses)
 
 @app.route('/update', methods=['POST'])

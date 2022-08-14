@@ -52,7 +52,9 @@ def TranslateZillow(user_query):
     if isinstance(v, bool): 
         if isinstance(zillow_convert[k], tuple): return [(z, {'min': v}) for z in zillow_convert[k]]
         else: return [(zillow_convert[k], {'value': v})]
-    elif isinstance(v, int) or isinstance(v, float): return [(zillow_convert[k], {'min': v})]
+    elif isinstance(v, int) or isinstance(v, float): 
+        if k == 'price': return [(zillow_convert[k], {'max': v})]
+        else: return [(zillow_convert[k], {'min': v})]
 
 
 def TranslateCraigslist(user_query):
