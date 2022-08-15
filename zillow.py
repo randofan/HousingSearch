@@ -53,7 +53,8 @@ def search_zillow(user_query=Filters()):
                  "isForSaleByOwner":{"value":False},
                  "isComingSoon":{"value":False},
                  "isForSaleByAgent":{"value":False},
-                 "isForRent":{"value":True}
+                 "isForRent":{"value":True},
+                 "sortSelection":{"value":"paymenta"}
              }
     }
     query['filterState'].update(dict(Translate(user_query, TranslationType.ZILLOW)))
@@ -75,7 +76,7 @@ def search_zillow(user_query=Filters()):
                           r['baths'] if 'baths' in r else 0, r['area'] if 'area' in r else 0,
                           f'https://www.zillow.com{r["detailUrl"]}', r['imgSrc'], r['latLong'])
             houses.append(house)    
-        except KeyError: print(f'ZILLOW: There was an error parsing https://www.zillow.com{r["detailUrl"]}')
+        except KeyError as e: print(f'ZILLOW: There was an error parsing https://www.zillow.com{r["detailUrl"]} with {e}')
         
     return houses
     
@@ -84,9 +85,4 @@ if __name__ == '__main__':
     houses = search_zillow(Filters(beds=3, price=2200))
     print(houses.pop())
     print(len(houses))
-    
-    # ds = Service('chromedriver.exe')
-    # driver = webdriver.Chrome(service=ds)
-    # driver.get("https://www.zillow.com/seattle-wa-98105/rentals/")
-    # driver.get('https://www.zillow.com/search/GetSearchPageState.htm?searchQueryState={"pagination":{},"usersSearchTerm":"98105","mapBounds":{"west":-122.31194831768799,"east":-122.25143768231202,"south":47.62593719553573,"north":47.69571206415039},"regionSelection":[{"regionId":99565,"regionType":7}],"isMapVisible":true,"filterState":{"isForSaleByAgent":{"value":false},"isForSaleByOwner":{"value":false},"isNewConstruction":{"value":false},"isForSaleForeclosure":{"value":false},"isComingSoon":{"value":false},"isAuction":{"value":false},"isForRent":{"value":true},"isAllHomes":{"value":true},"isMultiFamily":{"value":false},"isManufactured":{"value":false},"isLotLand":{"value":false}},"isListVisible":true,"mapZoom":14}&wants={"cat1":["listResults","mapResults"]}')
     

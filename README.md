@@ -7,3 +7,11 @@ Windows: `./env/Scripts/activate` \
 Unix: `source env/Scripts/activate`
 4. Run `python3 app.py`
 5. Open `localhost`
+
+## Using HousingSearch API
+```
+filters = Filters(price=2000, baths=2, beds=4)
+houses: list[House] = search_all(filters)
+# sort by price
+houses.sort(key=lambda house:house.price)
+

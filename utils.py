@@ -19,12 +19,6 @@ class House:
     url: str = ''
     image: str = ''
     coords: dict[str, float] = field(default_factory=dict)
-    
-    def __hash__(self) -> int:
-        return hash(str(self.coords)) # TODO check if I get duplicates still
-    
-    def __eq__(self, other):
-        return self.coords == other.coords
 
 @attr.s
 class Filters:
@@ -44,7 +38,8 @@ class InvalidFilterException(Exception):
     pass
 
 def getNum(num) -> int:
-    return int(re.sub("[^0-9|.]", "", num)) if num else 0
+    res = re.sub("[^0-9|.]", "", num) if num else 0
+    return float(res) if res != '' else 0
 
 
 def TranslateZillow(user_query):
