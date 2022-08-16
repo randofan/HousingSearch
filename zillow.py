@@ -1,9 +1,8 @@
-from selenium import webdriver, common
+from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import json
 import requests
-import time
 from utils import getNum, House, Filters, Translate, TranslationType
 
 def use_selenium(query, wants):

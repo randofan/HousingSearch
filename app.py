@@ -16,9 +16,5 @@ def index():
         houses: list[House] = search_all(Filters(**request.args))
     return render_template('index.html', houses=houses)
 
-@app.route('/update', methods=['POST'])
-def update():
-    pass
-
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,13 +1,10 @@
-from email.policy import default
-from logging import Filter
 import re
 from constants import zillow_convert, craigslist_convert
-from dataclasses import dataclass, field
 import attr
 from enum import Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Float, PickleType, DateTime, BigInteger
-from datetime import datetime, timezone
+from datetime import datetime
 
 class TranslationType(Enum):
     ZILLOW = 0
