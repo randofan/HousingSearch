@@ -17,4 +17,7 @@ filters = Filters(price=2000, baths=2, beds=4)
 houses: list[House] = search_all(filters)
 # sort by price
 houses.sort(key=lambda house:house.price)
+```
+The list of housing results are temporarily cached for a day before a query is made again. This is to prevent 
+making too many requests, so the IP address isn't banned from Craigslist or Zillow.
 
