@@ -58,7 +58,11 @@ def search_craigslist(user_query=Filters()):
                 
                 map_obj = soup.find(id='map')
                 coords = {'latitude': float(map_obj['data-latitude']), 'longitude': float(map_obj['data-longitude'])}
-                houses.append(House(address, price, beds, baths, area, url, image, coords))
+                
+                house = House(address=address, price=price, beds=beds, baths=baths, area=area, url=url, 
+                              image=image, coords=coords)
+                house.id = id(house)
+                houses.append(house)
             except Exception as e: print(f'CRAIGSLIST: There was an error parsing {url} at {prev} with {e}')
         prev += REQUESTS
         time.sleep(random.random() * 2)

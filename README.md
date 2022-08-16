@@ -10,6 +10,9 @@ Unix: `source env/Scripts/activate`
 
 ## Using HousingSearch API
 ```
+from utils import Filters, House
+from housingsearch import search_all
+
 filters = Filters(price=2000, baths=2, beds=4)
 houses: list[House] = search_all(filters)
 # sort by price

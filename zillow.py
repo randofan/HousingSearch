@@ -71,10 +71,11 @@ def search_zillow(user_query=Filters()):
     response = json.loads(raw_data)["cat1"]["searchResults"]["mapResults"]
     for r in response:
         try:          
-            house = House(r['detailUrl'].split('/')[2].replace('-', ' ') if r['address'] == '--' else r['address'],
-                          getNum(r['price']), r['beds'] if 'beds' in r else 0, 
-                          r['baths'] if 'baths' in r else 0, r['area'] if 'area' in r else 0,
-                          f'https://www.zillow.com{r["detailUrl"]}', r['imgSrc'], r['latLong'])
+            house = House(address=r['detailUrl'].split('/')[2].replace('-', ' ') if r['address'] == '--' else r['address'],
+                          price=getNum(r['price']), beds=r['beds'] if 'beds' in r else 0, 
+                          baths=r['baths'] if 'baths' in r else 0, area=r['area'] if 'area' in r else 0,
+                          url=f'https://www.zillow.com{r["detailUrl"]}', image=r['imgSrc'], coords=r['latLong'])
+            house.id = id(house)
             houses.append(house)    
         except KeyError as e: print(f'ZILLOW: There was an error parsing https://www.zillow.com{r["detailUrl"]} with {e}')
         

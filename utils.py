@@ -1,24 +1,37 @@
+from email.policy import default
 from logging import Filter
 import re
 from constants import zillow_convert, craigslist_convert
 from dataclasses import dataclass, field
 import attr
 from enum import Enum
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, Float, PickleType, DateTime, BigInteger
+from datetime import datetime, timezone
 
 class TranslationType(Enum):
     ZILLOW = 0
     CRAIGSLIST = 1
 
-@dataclass(frozen=True)
-class House:
-    address: str = ''
-    price: float = 0
-    beds: float = 0
-    baths: float = 0
-    area: float = 0
-    url: str = ''
-    image: str = ''
-    coords: dict[str, float] = field(default_factory=dict)
+
+base = declarative_base()
+class House(base):
+    
+    __tablename__ = 'house'
+    
+    address: str = Column(String, default = '')
+    price: float = Column(Float, default = 0.0)
+    beds: float = Column(Float, default = 0.0)
+    baths: float = Column(Float, default = 0.0)
+    area: float = Column(Float, default = 0.0)
+    url: str = Column(String, default = '')
+    image: str = Column(String, default = '')
+    coords: dict[str, float] = Column(PickleType)
+    id: int = Column(BigInteger, primary_key=True)
+    time: datetime = Column(DateTime, default=datetime.utcnow())
+    
+    def __repr__(self) -> str:
+        return f'''(address: {self.address}, price: {self.price}, beds: {self.beds}, baths: {self.baths}, area: {self.area}, url: {self.url}, image: {self.image}, coords: {self.coords}, time: {self.time})'''
 
 @attr.s
 class Filters:
@@ -37,7 +50,7 @@ class Filters:
 class InvalidFilterException(Exception):
     pass
 
-def getNum(num) -> int:
+def getNum(num) -> float:
     res = re.sub("[^0-9|.]", "", num) if num else 0
     return float(res) if res != '' else 0
 
