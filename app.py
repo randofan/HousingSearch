@@ -2,7 +2,6 @@ from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from utils import House, Filters
-from dacite import from_dict
 from housingsearch import search_all
 
 
@@ -14,7 +13,7 @@ def index():
     houses = []
     if request.args:
         houses: list[House] = search_all(Filters(**request.args))
-    return render_template('index.html', houses=houses)
+    return houses
 
 if __name__ == '__main__':
     app.run(debug=True)
