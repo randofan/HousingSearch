@@ -15,5 +15,7 @@ def index():
         # houses: list[House] = search_all(**filters)
         houses = [House('1234 Test Ln', 420, 1,1, 4200, 'https://www.google.com', 'https://image.com', {'latitude': 2000, 'longitude': 1000})]
     return houses
+
+
 if __name__ == '__main__':
     app.run(debug=True)
