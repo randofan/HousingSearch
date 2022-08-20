@@ -2,9 +2,11 @@ import asyncio
 import random
 import requests
 from bs4 import BeautifulSoup
-from utils import Translate, getNum, House, Filters, TranslationType
+from utils import Translate, getNum, TranslationType
+from models import House, Filters
 import time 
 from httpx import AsyncClient
+from datetime import datetime
 
 async def getURL(urls):
     async with AsyncClient() as client:
@@ -14,7 +16,7 @@ async def getURL(urls):
     soups = [BeautifulSoup(req.text, 'html.parser') for req in reqs]
     return soups
 
-def search_craigslist(user_query=Filters()):
+def search_craigslist(DATE_REFRESH, user_query=Filters()):
     
     query = [('bundleDuplicates',1), 
              ('postal',98105), 
@@ -28,7 +30,11 @@ def search_craigslist(user_query=Filters()):
     # return empty array if no results found
     if not soup.find(class_='result-row'): return []
     
-    urls = [url['href'] for url in soup.find_all('a', class_='result-title hdrlnk')]
+    # TODO log how long this array is overtime
+    urls = [url.find('a', class_='result-title hdrlnk')['href'] for url in soup.find_all('div', class_='result-info') 
+            if (url.find('time', class_='result-date')['datetime'] < DATE_REFRESH and 
+                not House.query.get_or_404(getNum(url.find('a', class_='result-title hdrlnk')['data-id'])))]
+    
     houses = list()
     
     prev = 0
@@ -58,10 +64,13 @@ def search_craigslist(user_query=Filters()):
                 
                 map_obj = soup.find(id='map')
                 coords = {'latitude': float(map_obj['data-latitude']), 'longitude': float(map_obj['data-longitude'])}
+                id = hash(f"{getNum(soup.find('div', class_='postinginfos').find('p', class_='postinginfo').text)}c")
+                date = datetime(soup.find('time', class_='date timeago')['datetime'])
                 
                 house = House(address=address, price=price, beds=beds, baths=baths, area=area, url=url, 
-                              image=image, coords=coords)
-                house.id = id(house)
+                              image=image, coords=coords, id=id, date=date, cats=user_query.cats, dogs=user_query.dogs, 
+                              parking=user_query.parking, laundry=user_query.laundry, apartment=user_query.apartment,
+                              townhouse=user_query.townhouse, house=user_query.house)
                 houses.append(house)
             except Exception as e: print(f'CRAIGSLIST: There was an error parsing {url} at {prev} with {e}')
         prev += REQUESTS
@@ -69,7 +78,4 @@ def search_craigslist(user_query=Filters()):
     return houses
 
 if __name__ == '__main__':
-    s = search_craigslist()
-    print(len(s))
-    # print(s)
-    print('\n')
+    pass

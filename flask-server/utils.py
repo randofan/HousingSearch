@@ -1,48 +1,10 @@
 import re
-from constants import zillow_convert, craigslist_convert
-import attr
+from conversions import zillow_convert, craigslist_convert
 from enum import Enum
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Float, PickleType, DateTime, BigInteger
-from datetime import datetime
 
 class TranslationType(Enum):
     ZILLOW = 0
     CRAIGSLIST = 1
-
-
-base = declarative_base()
-class House(base):
-    
-    __tablename__ = 'house'
-    
-    address: str = Column(String, default = '')
-    price: float = Column(Float, default = 0.0)
-    beds: float = Column(Float, default = 0.0)
-    baths: float = Column(Float, default = 0.0)
-    area: float = Column(Float, default = 0.0)
-    url: str = Column(String, default = '')
-    image: str = Column(String, default = '')
-    coords: dict[str, float] = Column(PickleType)
-    id: int = Column(BigInteger, primary_key=True)
-    time: datetime = Column(DateTime, default=datetime.utcnow())
-    
-    def __repr__(self) -> str:
-        return f'''(address: {self.address}, price: {self.price}, beds: {self.beds}, baths: {self.baths}, area: {self.area}, url: {self.url}, image: {self.image}, coords: {self.coords}, time: {self.time})'''
-
-@attr.s
-class Filters:
-    beds: int = attr.ib(validator=attr.validators.instance_of(int), default=0)
-    baths: int = attr.ib(validator=attr.validators.instance_of(int), default=0)
-    price: int = attr.ib(validator=attr.validators.instance_of(int), default=0)
-    sqft: int = attr.ib(validator=attr.validators.instance_of(int), default=0)
-    cats: bool = attr.ib(validator=attr.validators.instance_of(bool), default=False)
-    dogs: bool = attr.ib(validator=attr.validators.instance_of(bool), default=False)
-    parking: bool = attr.ib(validator=attr.validators.instance_of(bool), default=False)
-    laundry: bool = attr.ib(validator=attr.validators.instance_of(bool), default=False)
-    apartment: bool = attr.ib(validator=attr.validators.instance_of(bool), default=False)
-    townhouse: bool = attr.ib(validator=attr.validators.instance_of(bool), default=False)
-    house: bool = attr.ib(validator=attr.validators.instance_of(bool), default=False)
     
 class InvalidFilterException(Exception):
     pass
@@ -88,7 +50,3 @@ def Translate(filter, type):
         translation.extend(new_pair)
         
     return translation
-
-
-if __name__ == '__main__':
-    pass

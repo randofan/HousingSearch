@@ -3,7 +3,9 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import json
 import requests
-from utils import getNum, House, Filters, Translate, TranslationType
+from utils import getNum, Translate, TranslationType
+from models import House, Filters
+from datetime import datetime
 
 def use_selenium(query, wants):
     ds = Service('chromedriver.exe')
@@ -60,7 +62,7 @@ def search_zillow(user_query=Filters()):
     wants = {"cat1":['mapResults']}
     
     raw_data = use_requests(query, wants)
-    if not raw_data: raw_data = use_selenium(query, wants)
+    # if not raw_data: raw_data = use_selenium(query, wants)
     
     houses = list()
     if not raw_data: 
@@ -73,16 +75,16 @@ def search_zillow(user_query=Filters()):
             house = House(address=r['detailUrl'].split('/')[2].replace('-', ' ') if r['address'] == '--' else r['address'],
                           price=getNum(r['price']), beds=r['beds'] if 'beds' in r else 0, 
                           baths=r['baths'] if 'baths' in r else 0, area=r['area'] if 'area' in r else 0,
-                          url=f'https://www.zillow.com{r["detailUrl"]}', image=r['imgSrc'], coords=r['latLong'])
-            house.id = id(house)
-            houses.append(house)    
+                          url=f'https://www.zillow.com{r["detailUrl"]}', image=r['imgSrc'], coords=r['latLong'],
+                          id=hash(f"{r['zpid'] if 'zpid' in r else r['plid']}z"), date=datetime.now(),
+                          cats=user_query.cats, dogs=user_query.dogs, parking=user_query.parking, laundry=user_query.laundry,
+                          apartment=user_query.apartment, townhouse=user_query.townhouse, house=user_query.house)
+            houses.append(house)
         except KeyError as e: print(f'ZILLOW: There was an error parsing https://www.zillow.com{r["detailUrl"]} with {e}')
         
     return houses
     
 
 if __name__ == '__main__':
-    houses = search_zillow(Filters(beds=3, price=2200))
-    print(houses.pop())
-    print(len(houses))
+    pass
     
