@@ -5,7 +5,7 @@ export default function Home() {
     return (
         <div className="search-bar">
             <input type="text" className="search" placeholder="Enter a city, state, or zip code."></input>
-            <button>Search</button>
+            <button className="button">Search</button>
         </div>
     )
 }
