@@ -1,6 +1,6 @@
 import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import Home from './Home';
+import Search from './Search';
 import './styles/App.css';
 import MapManager from './MapManager';
 
@@ -8,8 +8,11 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <Home></Home>
+        <Search></Search>
         <MapManager></MapManager>
+        {/* <li className="map-container">
+          <ul></ul>
+        </li> */}
       </header>
     </div>
   );

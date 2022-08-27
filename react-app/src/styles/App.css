@@ -1,4 +1,8 @@
 .leaflet-container {
     width: 100vw;
     height: 90vw;
+    z-index: 0;
+}
+.map-container li {
+    list-style: none;
 }
