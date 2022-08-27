@@ -2,32 +2,46 @@
     --nav-width: 20%;
     --nav-height: 30px;
 }
+
 .bar-container {
     position: sticky;
 }
-.searchbar {
-    width: var(--nav-width);
+
+.bar-container button {
+    border-width: 0.5px;
+    width: 80px;
     height: var(--nav-height);
+    text-align: center;
+}
+
+.searchbar {
+    height: var(--nav-height);
+    width: 40%;
     padding-left: 10px;
     padding-top: 10px;
     display: inline-block;
 }
-.filterbar {
+.searchbar input {
+    height: var(--nav-height);
+    width: 80%;
+}
 
+.filterbar {
+    display: inline-block;
 }
-.button {
-    height: 30px;
-}
+
 .filterbar-item {
     width: calc(var(--nav-size)*0.8);
     list-style: none;
 }
+
 .filterbar-list {
     max-width: 80%;
     height: 100%;
-    display:flex;
+    display: flex;
     justify-content: flex-end;
 }
+
 .dropdown {
     position: absolute;
     top: fit-content;
