@@ -1,13 +1,37 @@
-.search {
-    width: 20%;
-    height: 30px;
+:root {
+    --nav-width: 20%;
+    --nav-height: 30px;
 }
-.search-bar {
-    height: 50px;
+.bar-container {
+    position: sticky;
+}
+.searchbar {
+    width: var(--nav-width);
+    height: var(--nav-height);
     padding-left: 10px;
     padding-top: 10px;
-    position: sticky;
+    display: inline-block;
+}
+.filterbar {
+
 }
 .button {
     height: 30px;
+}
+.filterbar-item {
+    width: calc(var(--nav-size)*0.8);
+    list-style: none;
+}
+.filterbar-list {
+    max-width: 80%;
+    height: 100%;
+    display:flex;
+    justify-content: flex-end;
+}
+.dropdown {
+    position: absolute;
+    top: fit-content;
+    z-index: 100;
+    width: 300px;
+    background-color: aqua;
 }
