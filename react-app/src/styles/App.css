@@ -1,6 +1,9 @@
+.App {
+    overflow: hidden;
+}
 .leaflet-container {
     width: 100vw;
-    height: 90vw;
+    height: 80vw;
     z-index: 0;
 }
 .map-container li {

@@ -7,13 +7,11 @@ import MapManager from './MapManager';
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
         <Search></Search>
         <MapManager></MapManager>
         {/* <li className="map-container">
           <ul></ul>
         </li> */}
-      </header>
     </div>
   );
 }

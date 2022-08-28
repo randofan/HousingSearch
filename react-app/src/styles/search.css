@@ -46,8 +46,7 @@ button :hover {
 }
 .dropdown {
     position: absolute;
-    top: fit-content;
-    width: 300px;
+    width: fit-content;
     background-color: var(--bg-color);;
     text-align: justify;
     border: 10px;
@@ -57,10 +56,16 @@ button :hover {
     display: inline-block;
     margin: 15px;
 }
-.dropdown-section h3 {
+h3 {
     display: inline-block;
     margin-bottom: 5px;
     margin-top: 0px;
+    font-size: 18px;
+}
+hr {
+    margin: 0;
+    border: 0.5px solid grey;
+    background-color: grey;
 }
 .item-label {
     display:block;
