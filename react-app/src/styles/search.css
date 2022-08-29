@@ -1,8 +1,39 @@
 :root {
     --nav-width: 20%;
-    --nav-height: 30px;
+    --nav-height: 40px;
     font-family: Helvetica, Arial, sans-serif;
     --bg-color: white;
+    --border-radius: 5px;
+    --form-border-width: 2px;
+    --hover-color: blue;
+}
+button {
+    border-radius: var(--border-radius);
+    border-width: var(--form-border-width);
+    height: var(--nav-height);
+    width: 100px;
+}
+button:hover {
+    cursor: pointer;
+}
+select{
+    width: 100px;
+    text-align: center;
+    border-radius: var(--border-radius);
+    border-width: var(--form-border-width);
+    height: var(--nav-height);
+}
+option {
+    padding: 10px;
+}
+
+select:hover {
+    border-color: var(--hover-color);
+}
+
+input {
+    border-radius: var(--border-radius);
+    border-width: var(--form-border-width)
 }
 .bar-container {
     position: sticky;
@@ -10,16 +41,7 @@
     background-color: var(--bg-color);
     filter: drop-shadow(0px 7px 4px rgba(100, 100, 100, 0.5));
 }
-.bar-container button {
-    border-width: 0.5px;
-    width: 80px;
-    height: var(--nav-height);
-    text-align: center;
-    background-color: var(--bg-color);
-}
-button :hover {
-    cursor:pointer;
-}
+
 .searchbar {
     height: var(--nav-height);
     width: 40%;
@@ -34,34 +56,14 @@ button :hover {
 .filterbar {
     display: inline-block;
 }
-.filterbar-item {
-    width: calc(var(--nav-size)*0.8);
-    list-style: none;
-}
 .filterbar-list {
-    max-width: 80%;
     height: 100%;
     display: flex;
     justify-content: flex-end;
 }
-.dropdown {
-    position: absolute;
-    top: fit-content;
-    width: 300px;
-    background-color: var(--bg-color);;
-    text-align: justify;
-    border: 10px;
-    border-color: black;
-}
-.dropdown-section {
+.filterbar-item {
+    list-style: none;
+    height: var(--nav-height);
     display: inline-block;
-    margin: 15px;
-}
-.dropdown-section h3 {
-    display: inline-block;
-    margin-bottom: 5px;
-    margin-top: 0px;
-}
-.item-label {
-    display:block;
+    margin: 1px;
 }
