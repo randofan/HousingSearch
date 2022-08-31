@@ -19,13 +19,15 @@ button:hover {
     cursor: pointer;
     background-color: var(--hover-color);
 }
-select{
-    width: 100px;
+select {
     text-align: center;
     border-radius: var(--border-radius);
     border-width: var(--form-border-width);
     border-color: var(--border-color);
+}
+.filter-select{
     height: var(--nav-height);
+    width: 100px;
 }
 option {
     height: 50px;

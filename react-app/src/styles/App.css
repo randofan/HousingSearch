@@ -2,7 +2,7 @@
     width: 60vw;
     height: 90vw;
     position: relative;
-    display: inline-block;
+    display: inline-flex;
 }
 .map {
     width: 100%;

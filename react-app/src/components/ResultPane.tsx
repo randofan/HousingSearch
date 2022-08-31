@@ -5,7 +5,14 @@ export default function ResultPane() {
     return (
         <div className="resultpane">
             <ListingContainer>
-                {/* just for testing purposes */}
+                <p className="sort">
+                    Sort by: <select className="select-sort">
+                        <option>default</option>
+                        <option>price (low to high)</option>
+                        <option>price (high to low)</option>
+                    </select>
+                </p>
+                {/* just for testing format purposes */}
                 <Listing
                     img="https://images.familyhomeplans.com/cdn-cgi/image/fit=scale-down,quality=85/plans/41438/41438-b580.jpg"
                     price="2000"

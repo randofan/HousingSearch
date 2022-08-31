@@ -7,10 +7,10 @@ export default function Search() {
             <SearchBar></SearchBar>
             <FilterBar>
                 <FilterBarSelect title="Beds" options={["Studio", "1+ Beds", "2+ Beds", "3+ Beds", "4+ Beds"]}></FilterBarSelect>
-                <FilterBarSelect title="Max Price" options={["Any", "$300", "$400", "$500", "$600", "$700", "$800"]}></FilterBarSelect>
+                <FilterBarSelect title="Max Price" options={["Any", "$300", "$400", "$500", "$600", "$700", "$800", "900", "1000", "1100","1200","1300"]}></FilterBarSelect>
                 <FilterBarSelect title="Type" options={["Apartment", "Townhouse", "House"]}></FilterBarSelect>
                 <FilterBarSelect title="More"></FilterBarSelect>
-                <button className="clear-button">Clear</button>
+                <button className="clear-button">clear</button>
             </FilterBar>
         </div>
     )
@@ -53,7 +53,7 @@ function FilterBarSelect(props: any) {
         }
     }
     return (
-        <li className="filterbar-item">
+        <li className="filterbar-item" key={props.title}>
             <select className="filter-select">
                 {options}
             </select>
