@@ -1,19 +1,16 @@
 import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import Search from './Search';
+import Search from './components/Search';
 import './styles/App.css';
-import MapManager from './MapManager';
+import MapManager from './components/MapManager';
+import ResultPane from './components/ResultPane';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
         <Search></Search>
-        <MapManager></MapManager>
-        {/* <li className="map-container">
-          <ul></ul>
-        </li> */}
-      </header>
+        <ResultPane></ResultPane>
+        <MapManager />
     </div>
   );
 }

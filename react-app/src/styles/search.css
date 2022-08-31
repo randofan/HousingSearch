@@ -4,27 +4,31 @@
     font-family: Helvetica, Arial, sans-serif;
     --bg-color: white;
     --border-radius: 5px;
-    --form-border-width: 2px;
-    --hover-color: blue;
+    --form-border-width: 1px;
+    --border-color: lightgrey;
+    --hover-color: rgb(147, 147, 226);
 }
 button {
     border-radius: var(--border-radius);
     border-width: var(--form-border-width);
+    border-color: var(--border-color);
     height: var(--nav-height);
     width: 100px;
 }
 button:hover {
     cursor: pointer;
+    background-color: var(--hover-color);
 }
 select{
     width: 100px;
     text-align: center;
     border-radius: var(--border-radius);
     border-width: var(--form-border-width);
+    border-color: var(--border-color);
     height: var(--nav-height);
 }
 option {
-    padding: 10px;
+    height: 50px;
 }
 
 select:hover {
@@ -33,7 +37,8 @@ select:hover {
 
 input {
     border-radius: var(--border-radius);
-    border-width: var(--form-border-width)
+    border-width: var(--form-border-width);
+    border-color: var(--border-color);
 }
 .bar-container {
     position: sticky;

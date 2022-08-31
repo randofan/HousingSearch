@@ -1,8 +1,8 @@
 import React from "react";
-import './styles/App.css';
+import '../styles/App.css';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 
-export default function Map() {
+export default function MapManager() {
     return (
         <div id="map">
             <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={true}>

@@ -1,0 +1,46 @@
+
+:root {
+    --background-color: white;
+}
+.resultpane {
+    background-color: var(--background-color);
+    height: 100vw;
+    width: 39vw;
+    z-index: 2;
+    border: black;
+    border-width: 10px;
+    position: relative;
+    display: flex;
+    overflow-y:auto;
+    filter: drop-shadow(3px 0px 5px rgba(100, 100, 100, 0.5));
+}
+.listing {
+    background-color: var(--background-color);
+    width: 30vw;
+    height: 200px;
+    margin: 10px;
+    display: inline-block;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: lightgrey;
+}
+.listing:hover {
+    filter: drop-shadow(0px 5px 4px rgba(100, 100, 100, 0.5));
+}
+.listing-image {
+    width: 50%;
+    border-radius: 4px;
+    object-fit: cover;
+    display: inline-block;
+    height: inherit;
+    float: left;
+}
+.listing-text {
+    background-color: inherit;
+    position: relative;
+    display: inline;
+}
+a {
+    text-decoration: none;
+}
