@@ -1,29 +1,14 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, Response
 import json
-from datetime import datetime
-
-
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-from models import House, Filters, db
+from models import Filters
 from housingsearch import search_all
 
+app = Flask(__name__)
 
-### DO NOT RUN!!! OR ELSE CRAIGSLIST AND ZILLOW WILL BAN YOUR IP ###
 @app.route('/', methods=['GET'])
 def index():
-    houses = []
-    if request.args:
-        houses: list[House] = search_all(Filters(**request.args))
-        try:
-            db.session.add_all(houses)
-            db.session.commit()
-            return jsonify(House.query.filter_by(**request.args).all())
-        except:
-            return 'Oopsie Daisy'
-        
+    if request.args: return json.dumps(search_all(Filters(**request.args)))
+    else: return Response("The response body goes here", status=400)
     # return json.dumps([House('1234 Test Ln', 420, 1,1, 4200, 'https://www.google.com', 'https://image.com', {'latitude': 2000, 'longitude': 1000},
     #                 1, datetime.now(), True, True, False, True, True, False, False)])
 

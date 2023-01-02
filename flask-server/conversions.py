@@ -10,8 +10,7 @@ craigslist_convert = {
     'price': 'min_price', # int
     'baths': 'min_bathrooms', # int
     'area': 'minSqft', # int
-    'cats': 'pets_cat', # 1=True
-    'dogs': 'pets_dog', # 1=True
+    'pets': ('pets_cat', 'pets_dog'), # 1=True
     'parking': {'parking': (1,2,3,4,5,6)},
     'laundry': {'laundry': (1,2,3,4)},
     'apartment': {'housing_type': 1},
@@ -35,8 +34,7 @@ zillow_convert = {
     'price': 'monthlyPayment', # int
     'baths': 'baths',  # int
     'area': 'sqft', # int
-    'cats': 'onlyRentalCatsAllowed', # bool
-    'dogs': ('onlyRentalLargeDogsAllowed', 'onlyRentalSmallDogsAllowed'), # bool
+    'pets': ('onlyRentalCatsAllowed', 'onlyRentalLargeDogsAllowed', 'onlyRentalSmallDogsAllowed'), # bool
     'parking': 'onlyRentalParkingAvailable', # bool
     'laundry': 'onlyRentalInUnitLaundry', # bool
     'apartment': 'isApartment', # bool

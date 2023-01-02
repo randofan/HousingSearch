@@ -5,8 +5,8 @@ import json
 import requests
 from utils import getNum, Translate, TranslationType
 from models import House, Filters
-from datetime import datetime
 
+# Use Selenium to get housing listings. Not being used anymore because requests is better.
 def use_selenium(query, wants):
     ds = Service('chromedriver.exe')
     with webdriver.Chrome(service=ds) as driver:
@@ -20,6 +20,19 @@ def use_selenium(query, wants):
             print('The dreaded Zillow Captcha with selenium...Unfortunately try again later')
             return None
         
+
+class ZillowCaptchaException(Exception):
+    print("Encountered Zillow Captcha. Please try again later.")
+
+
+# Sends a request to the Zillow server and stringified json of houses.
+
+# parameters:
+# - query
+# - wants
+
+# throws: ZillowCaptchaException if encounters a Zillow captcha preventing the request.
+# returns: raw data of stringified json of houses.
 def use_requests(query, wants):
     req_headers = {
         'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
@@ -32,9 +45,8 @@ def use_requests(query, wants):
         url = f"https://www.zillow.com/search/GetSearchPageState.htm?searchQueryState={json.dumps(query)}&wants={json.dumps(wants)}"
         r = s.get(url, headers=req_headers)
     if r: return r.text
-    else:
-        print('The dreaded Zillow Captcha with requests...Unfortunately try again later')
-        return None
+    else: raise ZillowCaptchaException
+
 
 def search_zillow(user_query=Filters()):
    
@@ -65,10 +77,6 @@ def search_zillow(user_query=Filters()):
     # if not raw_data: raw_data = use_selenium(query, wants)
     
     houses = list()
-    if not raw_data: 
-        print('Neither using Selenium nor Requests worked. No Response.')
-        return houses
-    
     response = json.loads(raw_data)["cat1"]["searchResults"]["mapResults"]
     for r in response:
         try:          
@@ -76,9 +84,7 @@ def search_zillow(user_query=Filters()):
                           price=getNum(r['price']), beds=r['beds'] if 'beds' in r else 0, 
                           baths=r['baths'] if 'baths' in r else 0, area=r['area'] if 'area' in r else 0,
                           url=f'https://www.zillow.com{r["detailUrl"]}', image=r['imgSrc'], coords=r['latLong'],
-                          id=hash(f"{r['zpid'] if 'zpid' in r else r['plid']}z"), date=datetime.now(),
-                          cats=user_query.cats, dogs=user_query.dogs, parking=user_query.parking, laundry=user_query.laundry,
-                          apartment=user_query.apartment, townhouse=user_query.townhouse, house=user_query.house)
+                          pets=user_query.pets, parking=user_query.parking, laundry=user_query.laundry)
             houses.append(house)
         except KeyError as e: print(f'ZILLOW: There was an error parsing https://www.zillow.com{r["detailUrl"]} with {e}')
         
