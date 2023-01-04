@@ -1,7 +1,7 @@
 import asyncio
-import requests
+from requests_html import HTMLSession
 from bs4 import BeautifulSoup
-from utils import Translate, getNum, TranslationType, CRAIGSLIST_RANGE
+from utils import Translate, getNum, TranslationType
 from models import House, Filters
 from httpx import AsyncClient
 
@@ -13,7 +13,7 @@ async def getURL(urls):
     soups = [BeautifulSoup(req.text, 'html.parser') for req in reqs]
     return soups
 
-def search_craigslist(start, range, user_query=Filters()):
+def search_craigslist(start: int, range: int, user_query: Filters=Filters()):
     
     query = [('bundleDuplicates',1), 
              ('postal',98105), 
@@ -23,11 +23,16 @@ def search_craigslist(start, range, user_query=Filters()):
     query.extend(Translate(user_query, TranslationType.CRAIGSLIST))
     query = "&".join(f'{k}={v}' for k,v in query)
     
-    soup = BeautifulSoup(requests.get(f'https://www.craigslist.org/search/apa?s=0&{query}').content, 'html.parser')
-    # return empty array if no results found
-    if not soup.find(class_='result-row'): return []
+    session = HTMLSession()
+    soup = session.get(f'https://www.craigslist.org/search/apa?s=0&{query}')
+    soup.html.render(sleep=1)
     
-    urls = [url.find('a', class_='result-title hdrlnk')['href'] for url in soup.find_all('div', class_='result-info')]
+    # return empty array if no results found
+    if not soup.find('a.cl-results-page'): 
+        print("no results found")
+        return []
+    
+    urls = [url.attrs['href'] for url in soup.find('a.titlestring')]
     limit_url = urls[min(start,len(urls)):min(start+range,len(urls))]
     soups = asyncio.run(getURL(limit_url))
     
@@ -60,4 +65,4 @@ def search_craigslist(start, range, user_query=Filters()):
     return houses
 
 if __name__ == '__main__':
-    pass
+    print(search_craigslist(0, 2))

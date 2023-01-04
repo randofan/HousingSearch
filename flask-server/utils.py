@@ -1,9 +1,7 @@
 import re
 from conversions import zillow_convert, craigslist_convert
 from enum import Enum
-from utils import Filters
-
-CRAIGSLIST_RANGE = 20
+from models import Filters
 
 class TranslationType(Enum):
     ZILLOW = 0

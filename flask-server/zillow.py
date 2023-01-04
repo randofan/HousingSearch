@@ -6,6 +6,10 @@ import requests
 from utils import getNum, Translate, TranslationType
 from models import House, Filters
 
+class ZillowCaptchaException(Exception):
+    pass
+    
+
 # Use Selenium to get housing listings. Not being used anymore because requests is better.
 def use_selenium(query, wants):
     ds = Service('chromedriver.exe')
@@ -19,10 +23,6 @@ def use_selenium(query, wants):
         else:
             print('The dreaded Zillow Captcha with selenium...Unfortunately try again later')
             return None
-        
-
-class ZillowCaptchaException(Exception):
-    print("Encountered Zillow Captcha. Please try again later.")
 
 
 # Sends a request to the Zillow server and stringified json of houses.
@@ -48,7 +48,7 @@ def use_requests(query, wants):
     else: raise ZillowCaptchaException
 
 
-def search_zillow(user_query=Filters()):
+def search_zillow(user_query: Filters=Filters()):
    
     query = {"pagination": {}, 
              "isMapVisible":True, 
@@ -92,5 +92,5 @@ def search_zillow(user_query=Filters()):
     
 
 if __name__ == '__main__':
-    pass
+    print(len(search_zillow(Filters(beds=5))))
     

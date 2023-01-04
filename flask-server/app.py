@@ -1,14 +1,19 @@
 from flask import Flask, request, Response
 import json
 from models import Filters
+import dataclasses
 from housingsearch import search_all
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET'])
+# TODO include try-catch here for invalid inputs
+@app.route('/search', methods=['GET'])
 def index():
-    if request.args: return json.dumps(search_all(Filters(**request.args)))
-    else: return Response("The response body goes here", status=400)
+    if request.args: 
+        try: return json.dumps([dataclasses.asdict(house) for house in search_all(Filters(**request.args))])
+        except Exception as e: return Response("Invalid Arguments", status=400)
+            
+    else: return Response("Require Arguments", status=400)
     # return json.dumps([House('1234 Test Ln', 420, 1,1, 4200, 'https://www.google.com', 'https://image.com', {'latitude': 2000, 'longitude': 1000},
     #                 1, datetime.now(), True, True, False, True, True, False, False)])
 

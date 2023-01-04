@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 import attr
-from datetime import datetime
 
 @dataclass(frozen=True)
 class House:
